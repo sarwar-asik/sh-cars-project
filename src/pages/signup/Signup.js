@@ -1,38 +1,49 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import logImg from "../../assets/images/login/login.svg";
+import app from "../../firebase/firebase.config";
+import { createUserWithEmailAndPassword, getAuth} from "firebase/auth";
+
+import { ToastContainer, toast } from 'react-toastify';
 import { AuthContext } from "../../contexts/ProvideContext";
 
-const Login = () => {
-const {login,user} = useContext(AuthContext)
+
+
+const auth = getAuth(app);
+
+
+const Signup = () => {
+  const [error, setError] = useState("");
+
+const {createUser,user} = useContext(AuthContext)
+
 // console.log(user);
-const [error,setError] = useState('')
 
   const handlelogin = (event) => {
-    event.preventDefault();
     event.preventDefault();
     const form = event.target;
     const email = form.email.value;
     const password = form.password.value;
     console.log(email, password);
-   
-login(email,password)
-.then((userCredential) => {
-  // Signed in 
-  const user = userCredential.user;
-  toast(user)
-  setError('')
-  // ...
-})
-.catch((error) => {
-  const errorCode = error.code;
-  const errorMessage = error.message;
-  setError(errorMessage)
-});
 
-setError('')
-
+    createUser(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        toast("registered");
+        alert('regiterd')
+        console.log(user);
+        setError('')
+        form.reset()
+        
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setError(errorMessage);
+       
+        // ..
+      });
+      setError('')
   };
   return (
     <div className="hero w-full my-20 ">
@@ -41,7 +52,7 @@ setError('')
           <img className="w-3/4" src={logImg} alt="" />
         </div>
         <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 text-center">
-          <h1 className="text-5xl font-bold">Login now!</h1>
+          <h1 className="text-5xl font-bold">Sign up,Please!</h1>
           <form onSubmit={handlelogin} className="card-body">
             <div className="form-control">
               <label className="label">
@@ -65,18 +76,18 @@ setError('')
                 className="input input-bordered"
               />
               <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
-                  Forgot password?
-                </a>
+                Did sign Up ?{" "}
+                <Link to={"/login"} className="text-blue-500">
+                  Log in please ...
+                </Link>
               </label>
               <p className="text-red-500">{error}</p>
-              <h6>Need register , <Link to={'/signup'}>register please..</Link></h6>
             </div>
 
             <div className="form-control mt-6">
               <input className="btn btn-primary" type="submit" value="Login" />
             </div>
-            <ToastContainer/>
+            <ToastContainer />
           </form>
         </div>
       </div>
@@ -84,4 +95,4 @@ setError('')
   );
 };
 
-export default Login;
+export default Signup;
