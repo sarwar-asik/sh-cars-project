@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { AuthContext } from "../../contexts/ProvideContext";
 
 const Checkout = () => {
@@ -8,6 +8,7 @@ const Checkout = () => {
 
   const { user } = useContext(AuthContext);
   // console.log(user,services);
+
   const onOrder = (event) => {
     event.preventDefault();
     const form = event.target;
@@ -20,10 +21,31 @@ const Checkout = () => {
       service: _id,
       serviceName: title,
       price,
+      email,
       customer: name,
       phone,
       message,
     };
+    //  if(phone.length>10){
+    //   alert('Phone numbers should be 10 character')
+    //  }
+
+    fetch("https://sh-cars-server.vercel.app/orders", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(order),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.acknowledged) {
+          form.reset();
+          alert("success orders");
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
   return (
@@ -49,6 +71,7 @@ const Checkout = () => {
             name="phone"
             placeholder="Your Phone"
             className="input input-bordered w-full"
+            required
           />
           <input
             type="text"
@@ -69,6 +92,9 @@ const Checkout = () => {
           value="Place Your Order"
         />
       </form>
+      <Link to={"/orders"} className="btn btn-outline btn-warning my-3 w-full">
+        Your Order
+      </Link>
     </div>
   );
 };

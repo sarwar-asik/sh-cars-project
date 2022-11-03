@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.svg";
+import { AuthContext } from "../../../contexts/ProvideContext";
 
 const Headers = () => {
+  const { user, logout } = useContext(AuthContext);
+// console.log(user);
   const menuItem = (
     <>
       <li className="font-semibold">
         <Link to={"/"}>Home</Link>
-        <Link to={'/login'}>Log In </Link>
-        <Link to={'/signup'}>Sign Up</Link>
+        {user?.email ? (
+          <div onClick={logout} className="btn btn-outline btn-error">Log Out</div>
+        ) : (
+          <Link to={"/login"}>Log In </Link>
+        )}
+        <Link to={"/signup"}>Sign Up</Link>
       </li>
     </>
   );
@@ -49,7 +56,7 @@ const Headers = () => {
           <ul className="menu menu-horizontal p-0">{menuItem}</ul>
         </div>
         <div className="navbar-end">
-        <button className="btn btn-outline btn-error">Appointment</button>
+          <button className="btn btn-outline btn-error">Appointment</button>
         </div>
       </div>
     </div>

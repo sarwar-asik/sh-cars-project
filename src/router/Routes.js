@@ -3,6 +3,7 @@ import Main from "../layout/Main";
 import Checkout from "../pages/checkout/Checkout";
 import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
+import Orders from "../pages/orders/Orders";
 import Signup from "../pages/signup/Signup";
 
 const router = createBrowserRouter([
@@ -25,7 +26,11 @@ const router = createBrowserRouter([
         {
           path:'/checkout/:id',
           element:<Checkout/>,
-          loader:({params})=>fetch(`http://localhost:5000/services/${params.id}`)
+          loader:({params})=>fetch(`https://sh-cars-server.vercel.app/services/${params.id}`)
+        },
+        {
+          path:'/orders',
+          element:<Orders/>
         }
       ]
     },
