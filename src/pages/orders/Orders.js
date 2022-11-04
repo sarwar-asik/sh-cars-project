@@ -3,20 +3,35 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/ProvideContext";
 import OrderRow from "./OrderRow";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const Orders = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const [orders, setOrder] = useState([]);
 
   // const url = `http://localhost:5000/orders?email=${user.email}`;
 
   useEffect(() => {
-    fetch(`https://sh-cars-server.vercel.app/orders?email=${user.email}`)
-      .then((res) => res.json())
-      .then((data) => setOrder(data));
+    fetch(`http://localhost:5000/orders?email=${user.email}`, {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("SHcarsToken")}`,
+      },
+    })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          logout();
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("receiverd", data);
+        setOrder(data);
+      });
   }, [user?.email]);
 
   const handleDelete = (id) => {
-    const proceed = window.confirm("are you Sure ?");
+    const proceed = window.confirm("Are you Sure ?");
     if (proceed) {
       fetch(`https://sh-cars-server.vercel.app/orders/${id}`, {
         method: "DELETE",
@@ -25,7 +40,7 @@ const Orders = () => {
         .then((data) => {
           console.log(data);
           if (data.deletedCount > 0) {
-            alert("deleted success");
+            toast("deleted success");
             const remaining = orders.filter((odr) => odr._id !== id);
             setOrder(remaining);
           }
@@ -34,7 +49,7 @@ const Orders = () => {
   };
 
   const statusUpdate = (id) => {
-    fetch(`https://sh-cars-server.vercel.app/orders/${id}`, {
+    fetch(`http://localhost:5000/orders/${id}`, {
       method: "PATCH",
       headers: {
         "content-type": "application/json",
@@ -44,7 +59,7 @@ const Orders = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        alert("updated status");
+        toast("updated status");
         if (data.modifiedCount > 0) {
           const remaining = orders.filter((odr) => odr._id !== id);
           const approving = orders.find((odr) => odr._id === id);
@@ -90,6 +105,7 @@ const Orders = () => {
           </tbody>
         </table>
       </div>
+      <ToastContainer />
     </div>
   );
 };

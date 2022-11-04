@@ -14,67 +14,60 @@ export const AuthContext = createContext();
 const auth = getAuth(app);
 
 const ProvideContext = ({ children }) => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
+
   const [loader, setloader] = useState(true);
 
   const createUser = (email, password) => {
-    setloader(true)
+    setloader(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
   const login = (email, password) => {
-    setloader(true)
+    setloader(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   useEffect(() => {
-    const unSubs = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log(currentUser);
-      setloader(false)
-
-      } else {
-        setUser({});
-      console.log('log in please');
-
-      }
+      setUser(currentUser);
+      setloader(false);
     });
+
     return () => {
-      return unSubs();
+      return unsubscribe();
     };
   }, []);
-  
 
-  const logout = ()=>{
-    return signOut(auth).then(() => {
-      alert('logout')
-    }).catch((error) => {
-      console.log(error.message,'from log out');
-    });
-  }
+  const logout = () => {
+    return signOut(auth)
+      .then(() => {
+        alert("logout");
+      })
+      .catch((error) => {
+        console.log(error.message, "from log out");
+      });
+  };
 
   const provider = new GoogleAuthProvider();
 
-
-  const googleSignIn = ()=>{
-
+  const googleSignIn = () => {
     return signInWithPopup(auth, provider)
-    .then((result) => {
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      const user = result.user;
-      console.log(user,'and',token);
-      alert('google sign in')
-    })
-    .catch((error) => {
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      console.log(credential);
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log(user, "and", token);
+        alert("google sign in");
+      })
+      .catch((error) => {
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log(credential);
+      });
+  };
 
-    });
-  }
-
-  const userInfo = { user, createUser, loader, login ,logout,googleSignIn };
+  const userInfo = { user, createUser, loader, login, logout, googleSignIn };
   return (
     <div>
       <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>

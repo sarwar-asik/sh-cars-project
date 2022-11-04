@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import logImg from "../../assets/images/login/login.svg";
+import { FaEye,FaEyeSlash } from "react-icons/fa";
 import app from "../../firebase/firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -18,7 +19,12 @@ const Signup = () => {
 
   const { createUser, user, googleSignIn } = useContext(AuthContext);
 
-  // console.log(user);
+  const [show,setshow] = useState(false)
+
+const handleShow = ()=>{
+return setshow(!show)
+}
+
 
   const handlelogin = (event) => {
     event.preventDefault();
@@ -90,50 +96,48 @@ const Signup = () => {
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Password</span>
+                <span className="label-text">Password</span> <span className="text-xl" onClick={handleShow}>{show?<FaEye/>:<FaEyeSlash/>}</span>
               </label>
               <input
-                type="password"
+                type={show?'text':'password'}
                 name="password"
                 placeholder="password"
                 className="input input-bordered"
               />
               <label className="label">
                 Did sign Up ?{" "}
-                <Link to={"/login"} className="text-blue-500">
+                <Link to={"/login"} className="text-blue-500 link link-hover">
                   Log in please ...
                 </Link>
               </label>
               <p className="text-red-500">{error}</p>
             </div>
 
-            {/* <div className="form-control mt-6">
+            <div className="form-control mt-6">
               <input
                 className="btn btn-primary"
                 type="submit"
                 value="Sign Up"
               />
-            </div> */}
-
-            <div className="flex w-full">
-            <div className="form-control mt-6 grid h-20 flex-grow card bg-base-300 rounded-box place-items-center btn btn-primary">
-              <input
-                className=""
-                type="submit"
-                value="Sign Up"
-              />
             </div>
 
-              <div className="divider divider-horizontal">OR</div>
-              <div onClick={googleSignIn} className="grid h-20 mt-6 flex-grow card bg-base-300 rounded-box place-items-center btn btn-outline btn-warning ">
-                <h2 className="text-yellow-800">Sign with <br /> <span  className="text-3xl text-yellow-700 font-semibold"> Google</span> </h2>
-              </div>
-            </div>
-
-            <ToastContainer />
           </form>
-          <div className=""></div>
+       
+          <div
+            onClick={googleSignIn}
+            className="grid h-20 mt-6 flex-grow card bg-base-300 rounded-box place-items-center btn btn-outline btn-warning "
+          >
+            <h2 className="text-yellow-800">
+              Sign with <br />{" "}
+              <span className="text-3xl text-yellow-700 font-semibold">
+                {" "}
+                Google
+              </span>{" "}
+            </h2>
+          </div>
+
         </div>
+        <ToastContainer />
       </div>
     </div>
   );

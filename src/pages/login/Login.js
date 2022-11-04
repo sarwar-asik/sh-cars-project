@@ -1,13 +1,25 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { FaEye,FaEyeSlash } from "react-icons/fa";
+
 import logImg from "../../assets/images/login/login.svg";
 import { AuthContext } from "../../contexts/ProvideContext";
 
 const Login = () => {
-const {login,user} = useContext(AuthContext)
-// console.log(user);
-const [error,setError] = useState('')
+  const { login, user } = useContext(AuthContext);
+  // console.log(user);
+  const [error, setError] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
+
+  const [show, setshow] = useState(false);
+
+  const handleShow = () => {
+    return setshow(!show);
+  };
 
   const handlelogin = (event) => {
     event.preventDefault();
@@ -16,23 +28,52 @@ const [error,setError] = useState('')
     const email = form.email.value;
     const password = form.password.value;
     console.log(email, password);
-   
-login(email,password)
-.then((userCredential) => {
-  // Signed in 
-  const user = userCredential.user;
-  toast(user)
-  setError('')
-  // ...
+
+    login(email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        toast(user);
+        setError("");
+        form.reset();
+        console.log(user.email)
+
+
+        const currentUser = {
+          email:user.email
+        }
+
+        console.log(currentUser);
+// get jwt token ////
+fetch('http://localhost:5000/jwt',{
+  method:'POST',
+  headers:{
+    'content-type':'application/json'
+  },
+  body:JSON.stringify(currentUser)
 })
-.catch((error) => {
-  const errorCode = error.code;
-  const errorMessage = error.message;
-  setError(errorMessage)
-});
+.then(res =>res.json())
+.then(data=>{
+  console.log(data);
+  //////// local storage is not best for jwt but easy .
 
-setError('')
+  localStorage.setItem('SHcarsToken',data.token)
+  toast('added token')
+  navigate(from, { replace: true });
 
+})
+
+
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setError(errorMessage);
+        
+      
+      });
+
+    setError("");
   };
   return (
     <div className="hero w-full my-20 ">
@@ -57,28 +98,31 @@ setError('')
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Password</span>
+                <span className="text-xl" onClick={handleShow}>{show?<FaEye/>:<FaEyeSlash/>}</span>
               </label>
               <input
-                type="password"
+                 type={show?'text':'password'}
                 name="password"
                 placeholder="password"
                 className="input input-bordered"
               />
               <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
+                <a href="." className="label-text-alt link link-hover">
                   Forgot password?
                 </a>
               </label>
               <p className="text-red-500">{error}</p>
-              <h6>Need register , <Link to={'/signup'}>register please..</Link></h6>
+              <h6>
+                Need register , <Link to={"/signup"}className='link link-hover'>register please....</Link>
+              </h6>
             </div>
 
             <div className="form-control mt-6">
               <input className="btn btn-primary" type="submit" value="Login" />
             </div>
-            <ToastContainer/>
           </form>
         </div>
+      <ToastContainer />
       </div>
     </div>
   );

@@ -16,6 +16,10 @@ const Headers = () => {
           <Link to={"/login"}>Log In </Link>
         )}
         <Link to={"/signup"}>Sign Up</Link>
+        {user?.email&&
+        <Link to={'/orders'} className='text-center'>Orders <br /> {user.displayName}</Link>
+
+        }
       </li>
     </>
   );
