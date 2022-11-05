@@ -1,14 +1,16 @@
 import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { FaEye,FaEyeSlash } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import logImg from "../../assets/images/login/login.svg";
 import { AuthContext } from "../../contexts/ProvideContext";
+import SocialLogin from "../socialLogin/SocialLogin";
+import { AuthToken } from "../../jwtToken/AuthToken";
 
 const Login = () => {
-  const { login, user } = useContext(AuthContext);
+  const { login, googleSignIn } = useContext(AuthContext);
   // console.log(user);
   const [error, setError] = useState("");
   const location = useLocation();
@@ -36,41 +38,16 @@ const Login = () => {
         toast(user);
         setError("");
         form.reset();
-        console.log(user.email)
+        console.log(user.email);
+        // added a token //
 
-
-        const currentUser = {
-          email:user.email
-        }
-
-        console.log(currentUser);
-// get jwt token ////
-fetch('http://localhost:5000/jwt',{
-  method:'POST',
-  headers:{
-    'content-type':'application/json'
-  },
-  body:JSON.stringify(currentUser)
-})
-.then(res =>res.json())
-.then(data=>{
-  console.log(data);
-  //////// local storage is not best for jwt but easy .
-
-  localStorage.setItem('SHcarsToken',data.token)
-  toast('added token')
-  navigate(from, { replace: true });
-
-})
-
-
+        <AuthToken></AuthToken>
+      
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         setError(errorMessage);
-        
-      
       });
 
     setError("");
@@ -98,22 +75,27 @@ fetch('http://localhost:5000/jwt',{
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Password</span>
-                <span className="text-xl" onClick={handleShow}>{show?<FaEye/>:<FaEyeSlash/>}</span>
+                <span className="text-xl" onClick={handleShow}>
+                  {show ? <FaEye /> : <FaEyeSlash />}
+                </span>
               </label>
               <input
-                 type={show?'text':'password'}
+                type={show ? "text" : "password"}
                 name="password"
                 placeholder="password"
                 className="input input-bordered"
               />
               <label className="label">
-                <a href="." className="label-text-alt link link-hover">
+                <a href="#." className="label-text-alt link link-hover">
                   Forgot password?
                 </a>
               </label>
               <p className="text-red-500">{error}</p>
               <h6>
-                Need register , <Link to={"/signup"}className='link link-hover'>register please....</Link>
+                Need register ,{" "}
+                <Link to={"/signup"} className="link link-hover">
+                  register please....
+                </Link>
               </h6>
             </div>
 
@@ -121,8 +103,9 @@ fetch('http://localhost:5000/jwt',{
               <input className="btn btn-primary" type="submit" value="Login" />
             </div>
           </form>
+          <SocialLogin></SocialLogin>
         </div>
-      <ToastContainer />
+        <ToastContainer />
       </div>
     </div>
   );

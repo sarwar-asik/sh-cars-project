@@ -13,28 +13,33 @@ const Orders = () => {
   // const url = `http://localhost:5000/orders?email=${user.email}`;
 
   useEffect(() => {
-    fetch(`http://localhost:5000/orders?email=${user.email}`, {
+    fetch(`https://sh-cars-server.vercel.app/orders?email=${user.email}`, {
       headers: {
         authorization: `Bearer ${localStorage.getItem("SHcarsToken")}`,
       },
     })
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
-          logout();
+         return logout();
         }
         return res.json();
       })
       .then((data) => {
-        console.log("receiverd", data);
+        console.log("received", data);
         setOrder(data);
       });
-  }, [user?.email]);
+  }, [user?.email,logout]);
 
   const handleDelete = (id) => {
     const proceed = window.confirm("Are you Sure ?");
     if (proceed) {
       fetch(`https://sh-cars-server.vercel.app/orders/${id}`, {
         method: "DELETE",
+        
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("SHcarsToken")}`,
+          },
+        
       })
         .then((res) => res.json())
         .then((data) => {
@@ -53,6 +58,7 @@ const Orders = () => {
       method: "PATCH",
       headers: {
         "content-type": "application/json",
+        authorization: `Bearer ${localStorage.getItem("SHcarsToken")}`
       },
       body: JSON.stringify({ status: "Approved" }),
     })

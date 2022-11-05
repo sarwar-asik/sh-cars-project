@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import logImg from "../../assets/images/login/login.svg";
-import { FaEye,FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import app from "../../firebase/firebase.config";
 import {
   createUserWithEmailAndPassword,
@@ -11,6 +11,7 @@ import {
 
 import { ToastContainer, toast } from "react-toastify";
 import { AuthContext } from "../../contexts/ProvideContext";
+import { AuthToken } from "../../jwtToken/AuthToken";
 
 const auth = getAuth(app);
 
@@ -19,12 +20,11 @@ const Signup = () => {
 
   const { createUser, user, googleSignIn } = useContext(AuthContext);
 
-  const [show,setshow] = useState(false)
+  const [show, setshow] = useState(false);
 
-const handleShow = ()=>{
-return setshow(!show)
-}
-
+  const handleShow = () => {
+    return setshow(!show);
+  };
 
   const handlelogin = (event) => {
     event.preventDefault();
@@ -38,10 +38,10 @@ return setshow(!show)
       .then((userCredential) => {
         const user = userCredential.user;
         toast("registered");
-        alert("regiterd");
         console.log(user);
         setError("");
         form.reset();
+        AuthToken(user);
 
         updateProfile(auth.currentUser, {
           displayName: name,
@@ -96,10 +96,13 @@ return setshow(!show)
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Password</span> <span className="text-xl" onClick={handleShow}>{show?<FaEye/>:<FaEyeSlash/>}</span>
+                <span className="label-text">Password</span>{" "}
+                <span className="text-xl" onClick={handleShow}>
+                  {show ? <FaEye /> : <FaEyeSlash />}
+                </span>
               </label>
               <input
-                type={show?'text':'password'}
+                type={show ? "text" : "password"}
                 name="password"
                 placeholder="password"
                 className="input input-bordered"
@@ -120,9 +123,8 @@ return setshow(!show)
                 value="Sign Up"
               />
             </div>
-
           </form>
-       
+
           <div
             onClick={googleSignIn}
             className="grid h-20 mt-6 flex-grow card bg-base-300 rounded-box place-items-center btn btn-outline btn-warning "
@@ -135,7 +137,6 @@ return setshow(!show)
               </span>{" "}
             </h2>
           </div>
-
         </div>
         <ToastContainer />
       </div>

@@ -8,6 +8,8 @@ import {
   signOut,
 } from "firebase/auth";
 import React, { createContext, useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import { AuthToken } from "../jwtToken/AuthToken";
 import app from "../firebase/firebase.config";
 
 export const AuthContext = createContext();
@@ -41,6 +43,7 @@ const ProvideContext = ({ children }) => {
   }, []);
 
   const logout = () => {
+    localStorage.removeItem("SHcarsToken");
     return signOut(auth)
       .then(() => {
         alert("logout");
@@ -55,11 +58,12 @@ const ProvideContext = ({ children }) => {
   const googleSignIn = () => {
     return signInWithPopup(auth, provider)
       .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
         const user = result.user;
-        console.log(user, "and", token);
-        alert("google sign in");
+        console.log(user);
+        toast("google sign in");
+        setloader(true);
+        // for token ////
+        AuthToken(user);
       })
       .catch((error) => {
         const credential = GoogleAuthProvider.credentialFromError(error);
@@ -71,6 +75,7 @@ const ProvideContext = ({ children }) => {
   return (
     <div>
       <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>
+      <ToastContainer />
     </div>
   );
 };

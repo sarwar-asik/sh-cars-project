@@ -34,6 +34,7 @@ const Checkout = () => {
       method: "POST",
       headers: {
         "content-type": "application/json",
+        authorization: `Bearer ${localStorage.getItem("SHcarsToken")}`,
       },
       body: JSON.stringify(order),
     })
